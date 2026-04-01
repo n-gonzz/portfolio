@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Terminal, Menu, X, ChevronRight, Trophy } from "lucide-react";
-import { navLinks, personalInfo } from "../data/mock";
+import { Terminal, Menu, X, ChevronRight, Trophy, Globe } from "lucide-react";
+import { personalInfo } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
+  const { lang, toggleLang } = useLang();
+
+  const navLinks = [
+    { label: t(translations.nav.home, lang), href: "#home" },
+    { label: t(translations.nav.skills, lang), href: "#skills" },
+    { label: t(translations.nav.projects, lang), href: "#projects" },
+    { label: t(translations.nav.education, lang), href: "#education" },
+    { label: t(translations.nav.contact, lang), href: "#contact" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,6 +94,16 @@ const Header = () => {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            {/* Language toggle */}
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1.5 bg-[#12121a] border border-[#1e1e2e] hover:border-[#2a2a3e] rounded-full px-3 py-1.5 text-xs font-mono font-bold text-[#8a8a9a] hover:text-[#00d4aa] transition-all duration-200"
+              title={lang === "en" ? "Cambiar a Español" : "Switch to English"}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {lang === "en" ? "ES" : "EN"}
+            </button>
+
             {/* Level badge */}
             <div className="hidden sm:flex items-center gap-2 bg-[#12121a] border border-[#1e1e2e] rounded-full px-3 py-1.5">
               <span className="text-xs font-mono font-bold text-[#ffd700]">
@@ -104,7 +125,7 @@ const Header = () => {
               onClick={() => scrollTo("#contact")}
               className="hidden sm:flex items-center gap-1 bg-[#00d4aa] hover:bg-[#00e4ba] text-[#0a0a0f] font-bold text-sm px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,212,170,0.3)]"
             >
-              Hire Me
+              {t(translations.header.hireMe, lang)}
               <ChevronRight className="w-4 h-4" />
             </button>
 
@@ -152,7 +173,7 @@ const Header = () => {
               onClick={() => scrollTo("#contact")}
               className="w-full mt-2 flex items-center justify-center gap-1 bg-[#00d4aa] text-[#0a0a0f] font-bold text-sm px-4 py-2.5 rounded-lg"
             >
-              Hire Me
+              {t(translations.header.hireMe, lang)}
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

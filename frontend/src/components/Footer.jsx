@@ -1,8 +1,11 @@
 import React from "react";
 import { Github, Linkedin, Mail, ArrowUp, Terminal } from "lucide-react";
 import { personalInfo } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const Footer = () => {
+  const { lang } = useLang();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -41,7 +44,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-xs text-[#6b7280]">
-              Building the future, one commit at a time.
+              {t(translations.footer.tagline, lang)}
             </p>
           </div>
 

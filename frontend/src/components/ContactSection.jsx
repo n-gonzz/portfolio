@@ -13,6 +13,8 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { personalInfo } from "../data/mock";
 import { toast } from "../hooks/use-toast";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const ContactSection = () => {
   const [visible, setVisible] = useState(false);
@@ -25,6 +27,7 @@ const ContactSection = () => {
     message: "",
   });
   const sectionRef = useRef(null);
+  const { lang } = useLang();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -45,8 +48,8 @@ const ContactSection = () => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields.",
+        title: t(translations.contact.toastMissing, lang),
+        description: t(translations.contact.toastMissingDesc, lang),
         variant: "destructive",
       });
       return;
@@ -61,8 +64,8 @@ const ContactSection = () => {
       setSent(true);
       setForm({ name: "", email: "", subject: "", message: "" });
       toast({
-        title: "Message sent!",
-        description: "Thanks for reaching out. I'll get back to you soon!",
+        title: t(translations.contact.toastSuccess, lang),
+        description: t(translations.contact.toastSuccessDesc, lang),
       });
       setTimeout(() => setSent(false), 3000);
     }, 1500);
@@ -71,28 +74,28 @@ const ContactSection = () => {
   const contactInfo = [
     {
       icon: Mail,
-      label: "Email",
+      label: t(translations.contact.labels.email, lang),
       value: personalInfo.email,
       href: `mailto:${personalInfo.email}`,
       color: "#00d4aa",
     },
     {
       icon: MapPin,
-      label: "Location",
+      label: t(translations.contact.labels.location, lang),
       value: personalInfo.location,
       href: null,
       color: "#00d4aa",
     },
     {
       icon: Github,
-      label: "GitHub",
+      label: t(translations.contact.labels.github, lang),
       value: personalInfo.githubHandle,
       href: personalInfo.github,
       color: "#00d4aa",
     },
     {
       icon: Linkedin,
-      label: "LinkedIn",
+      label: t(translations.contact.labels.linkedin, lang),
       value: personalInfo.linkedinHandle,
       href: personalInfo.linkedin,
       color: "#00d4aa",
@@ -115,14 +118,14 @@ const ContactSection = () => {
               <MessageSquare className="w-5 h-5 text-[#3b82f6]" />
             </div>
             <span className="text-xs font-mono font-bold tracking-[0.2em] text-[#3b82f6] uppercase">
-              New Quest
+              {t(translations.contact.label, lang)}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white font-figtree mb-3">
-            Let's Build Something
+            {t(translations.contact.heading, lang)}
           </h2>
           <p className="text-[#8a8a9a] text-base max-w-lg mb-10">
-            Have a project in mind? Let's team up and create something amazing together.
+            {t(translations.contact.description, lang)}
           </p>
         </div>
 
@@ -140,49 +143,49 @@ const ContactSection = () => {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-[#8a8a9a] mb-1.5 block">
-                  Name <span className="text-[#ef4444]">*</span>
+                  {t(translations.contact.name, lang)} <span className="text-[#ef4444]">*</span>
                 </label>
                 <Input
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Your name"
+                  placeholder={t(translations.contact.namePlaceholder, lang)}
                   className="bg-[#12121a] border-[#1e1e2e] text-white placeholder:text-[#3a3a4a] focus:border-[#00d4aa] focus:ring-[#00d4aa]/20 h-11"
                 />
               </div>
               <div>
                 <label className="text-sm text-[#8a8a9a] mb-1.5 block">
-                  Email <span className="text-[#ef4444]">*</span>
+                  {t(translations.contact.email, lang)} <span className="text-[#ef4444]">*</span>
                 </label>
                 <Input
                   name="email"
                   type="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="your@email.com"
+                  placeholder={t(translations.contact.emailPlaceholder, lang)}
                   className="bg-[#12121a] border-[#1e1e2e] text-white placeholder:text-[#3a3a4a] focus:border-[#00d4aa] focus:ring-[#00d4aa]/20 h-11"
                 />
               </div>
             </div>
             <div>
-              <label className="text-sm text-[#8a8a9a] mb-1.5 block">Subject</label>
+              <label className="text-sm text-[#8a8a9a] mb-1.5 block">{t(translations.contact.subject, lang)}</label>
               <Input
                 name="subject"
                 value={form.subject}
                 onChange={handleChange}
-                placeholder="What's this about?"
+                placeholder={t(translations.contact.subjectPlaceholder, lang)}
                 className="bg-[#12121a] border-[#1e1e2e] text-white placeholder:text-[#3a3a4a] focus:border-[#00d4aa] focus:ring-[#00d4aa]/20 h-11"
               />
             </div>
             <div>
               <label className="text-sm text-[#8a8a9a] mb-1.5 block">
-                Message <span className="text-[#ef4444]">*</span>
+                {t(translations.contact.message, lang)} <span className="text-[#ef4444]">*</span>
               </label>
               <Textarea
                 name="message"
                 value={form.message}
                 onChange={handleChange}
-                placeholder="Tell me about your project..."
+                placeholder={t(translations.contact.messagePlaceholder, lang)}
                 rows={6}
                 className="bg-[#12121a] border-[#1e1e2e] text-white placeholder:text-[#3a3a4a] focus:border-[#00d4aa] focus:ring-[#00d4aa]/20 resize-none"
               />
@@ -199,7 +202,7 @@ const ContactSection = () => {
               ) : (
                 <Send className="w-4 h-4" />
               )}
-              {sending ? "Sending..." : sent ? "Sent!" : "Send Message"}
+              {sending ? t(translations.contact.sending, lang) : sent ? t(translations.contact.sent, lang) : t(translations.contact.send, lang)}
             </button>
           </form>
 
@@ -213,7 +216,7 @@ const ContactSection = () => {
             }}
           >
             <div className="bg-[#12121a]/40 backdrop-blur-sm border border-[#1e1e2e] rounded-2xl p-6">
-              <h3 className="text-lg font-bold text-white mb-5">Get in Touch</h3>
+              <h3 className="text-lg font-bold text-white mb-5">{t(translations.contact.getInTouch, lang)}</h3>
               <div className="space-y-4">
                 {contactInfo.map((info) => {
                   const Icon = info.icon;
@@ -254,8 +257,7 @@ const ContactSection = () => {
             </div>
             <div className="mt-4 bg-[#12121a]/40 backdrop-blur-sm border border-[#1e1e2e] rounded-xl p-4">
               <p className="text-xs text-[#6b7280] leading-relaxed">
-                I typically respond within 24 hours. For urgent matters, reach me
-                directly via email or LinkedIn.
+                {t(translations.contact.responseNote, lang)}
               </p>
             </div>
           </div>

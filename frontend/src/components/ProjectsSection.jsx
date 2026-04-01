@@ -16,13 +16,19 @@ import {
   totalProjectXP,
   difficultyConfig,
 } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const diffIcons = { Flame, Target, Shield };
 
-const ProjectCard = ({ project, index, visible }) => {
+const ProjectCard = ({ project, index, visible, lang, projectIndex }) => {
   const [expanded, setExpanded] = useState(false);
   const diff = difficultyConfig[project.difficulty];
   const DiffIcon = diffIcons[diff.icon];
+  const tp = translations.projects.items[projectIndex];
+  const diffLabel = project.difficulty === "Hard" ? t(translations.projects.hard, lang) :
+    project.difficulty === "Medium" ? t(translations.projects.medium, lang) :
+    t(translations.projects.easy, lang);
 
   return (
     <div
@@ -45,7 +51,7 @@ const ProjectCard = ({ project, index, visible }) => {
             }}
           >
             <DiffIcon className="w-3 h-3" />
-            {project.difficulty}
+            {diffLabel}
           </span>
           <span className="text-[10px] font-mono text-[#6b7280]">
             {diff.multiplier} XP
@@ -54,7 +60,7 @@ const ProjectCard = ({ project, index, visible }) => {
         <div className="flex items-center gap-1">
           {project.status === "in-progress" && (
             <span className="text-[10px] font-mono font-bold text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/30 px-2 py-0.5 rounded-full mr-2">
-              In Progress
+              {t(translations.projects.inProgress, lang)}
             </span>
           )}
           <Coins className="w-3.5 h-3.5 text-[#ffd700]" />
@@ -65,19 +71,19 @@ const ProjectCard = ({ project, index, visible }) => {
       </div>
 
       {/* Title & Description */}
-      <h3 className="text-lg font-bold text-white mb-2">{project.name}</h3>
+      <h3 className="text-lg font-bold text-white mb-2">{t(tp.name, lang)}</h3>
       <p className="text-sm text-[#8a8a9a] mb-4 leading-relaxed flex-1">
-        {project.description}
+        {t(tp.description, lang)}
       </p>
 
       {/* Tech tags */}
       <div className="flex flex-wrap gap-1.5 mb-4">
-        {project.tech.map((t) => (
+        {project.tech.map((tag) => (
           <span
-            key={t}
+            key={tag}
             className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-[#1e1e2e] border border-[#2a2a3e] text-[#8a8a9a]"
           >
-            {t}
+            {tag}
           </span>
         ))}
       </div>
@@ -87,7 +93,7 @@ const ProjectCard = ({ project, index, visible }) => {
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-1 text-sm font-medium text-[#00d4aa] hover:text-[#00e4ba] transition-colors mb-3"
       >
-        {expanded ? "Hide" : "Show"} Challenge & Solution
+        {expanded ? t(translations.projects.hideChallenge, lang) : t(translations.projects.showChallenge, lang)}
         {expanded ? (
           <ChevronUp className="w-4 h-4" />
         ) : (
@@ -100,19 +106,19 @@ const ProjectCard = ({ project, index, visible }) => {
           <div className="bg-[#ef4444]/5 border border-[#ef4444]/20 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-1">
               <AlertTriangle className="w-3.5 h-3.5 text-[#ef4444]" />
-              <span className="text-xs font-bold text-[#ef4444]">Challenge</span>
+              <span className="text-xs font-bold text-[#ef4444]">{t(translations.projects.challenge, lang)}</span>
             </div>
             <p className="text-xs text-[#8a8a9a] leading-relaxed">
-              {project.challenge}
+              {t(tp.challenge, lang)}
             </p>
           </div>
           <div className="bg-[#00d4aa]/5 border border-[#00d4aa]/20 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-1">
               <CheckCircle className="w-3.5 h-3.5 text-[#00d4aa]" />
-              <span className="text-xs font-bold text-[#00d4aa]">Solution</span>
+              <span className="text-xs font-bold text-[#00d4aa]">{t(translations.projects.solution, lang)}</span>
             </div>
             <p className="text-xs text-[#8a8a9a] leading-relaxed">
-              {project.solution}
+              {t(tp.solution, lang)}
             </p>
           </div>
         </div>
@@ -128,7 +134,7 @@ const ProjectCard = ({ project, index, visible }) => {
             className="flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#00d4aa] transition-colors"
           >
             <Github className="w-4 h-4" />
-            Code
+            {t(translations.projects.code, lang)}
           </a>
         )}
         {project.live && (
@@ -139,7 +145,7 @@ const ProjectCard = ({ project, index, visible }) => {
             className="flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#00d4aa] transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
-            Live Demo
+            {t(translations.projects.liveDemo, lang)}
           </a>
         )}
       </div>
@@ -149,8 +155,9 @@ const ProjectCard = ({ project, index, visible }) => {
 
 const ProjectsSection = () => {
   const [visible, setVisible] = useState(false);
-  const [filter, setFilter] = useState("All Quests");
+  const [filter, setFilter] = useState("all");
   const sectionRef = useRef(null);
+  const { lang } = useLang();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -168,14 +175,14 @@ const ProjectsSection = () => {
   const easyCount = projects.filter((p) => p.difficulty === "Easy").length;
 
   const filters = [
-    { label: "All Quests", count: null },
-    { label: "Hard", count: hardCount },
-    { label: "Medium", count: mediumCount },
-    { label: "Easy", count: easyCount },
+    { key: "all", label: t(translations.projects.allQuests, lang), count: null },
+    { key: "Hard", label: t(translations.projects.hard, lang), count: hardCount },
+    { key: "Medium", label: t(translations.projects.medium, lang), count: mediumCount },
+    { key: "Easy", label: t(translations.projects.easy, lang), count: easyCount },
   ];
 
   const filteredProjects =
-    filter === "All Quests"
+    filter === "all"
       ? projects
       : projects.filter((p) => p.difficulty === filter);
 
@@ -195,14 +202,14 @@ const ProjectsSection = () => {
               <Coins className="w-5 h-5 text-[#ffd700]" />
             </div>
             <span className="text-xs font-mono font-bold tracking-[0.2em] text-[#ffd700] uppercase">
-              Quest Log
+              {t(translations.projects.label, lang)}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white font-figtree mb-3">
-            Featured Projects
+            {t(translations.projects.heading, lang)}
           </h2>
           <p className="text-[#8a8a9a] text-base mb-8">
-            Each project is a quest completed. Total XP earned:{" "}
+            {t(translations.projects.xpEarned, lang)}{" "}
             <span className="font-mono font-bold text-[#ffd700]">
               {totalProjectXP.toLocaleString()}
             </span>
@@ -219,10 +226,10 @@ const ProjectsSection = () => {
         >
           {filters.map((f) => (
             <button
-              key={f.label}
-              onClick={() => setFilter(f.label)}
+              key={f.key}
+              onClick={() => setFilter(f.key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                filter === f.label
+                filter === f.key
                   ? "bg-[#00d4aa]/10 text-[#00d4aa] border border-[#00d4aa]/30"
                   : "bg-[#12121a]/60 text-[#6b7280] border border-[#1e1e2e] hover:border-[#2a2a3e] hover:text-[#8a8a9a]"
               }`}
@@ -243,6 +250,8 @@ const ProjectsSection = () => {
               project={project}
               index={i}
               visible={visible}
+              lang={lang}
+              projectIndex={projects.indexOf(project)}
             />
           ))}
         </div>

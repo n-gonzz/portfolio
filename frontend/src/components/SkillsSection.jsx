@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { skillCategories, totalSkillXP, rankColors } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const tabIcons = {
   Frontend: Monitor,
@@ -17,9 +19,10 @@ const tabIcons = {
   "DevOps & Tools": Wrench,
 };
 
-const SkillBar = ({ skill, index, visible }) => {
+const SkillBar = ({ skill, index, visible, lang }) => {
   const [width, setWidth] = useState(0);
   const barColor = rankColors[skill.rank];
+  const rankLabel = t(translations.skills.ranks[skill.rank], lang);
 
   useEffect(() => {
     if (visible) {
@@ -52,7 +55,7 @@ const SkillBar = ({ skill, index, visible }) => {
               border: `1px solid ${barColor}30`,
             }}
           >
-            {skill.rank}
+            {rankLabel}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -88,6 +91,7 @@ const SkillsSection = () => {
   const [visible, setVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("Frontend");
   const sectionRef = useRef(null);
+  const { lang } = useLang();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -118,20 +122,19 @@ const SkillsSection = () => {
               <Zap className="w-5 h-5 text-[#00d4aa]" />
             </div>
             <span className="text-xs font-mono font-bold tracking-[0.2em] text-[#00d4aa] uppercase">
-              Skill Tree
+              {t(translations.skills.label, lang)}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white font-figtree mb-3">
-            Tech Arsenal
+            {t(translations.skills.heading, lang)}
           </h2>
           <p className="text-[#8a8a9a] text-base max-w-lg mb-4">
-            Leveling up every day. Here's my current skill tree with XP earned
-            across different domains.
+            {t(translations.skills.description, lang)}
           </p>
           <div className="flex items-center gap-2 mb-10">
             <TrendingUp className="w-4 h-4 text-[#00d4aa]" />
             <span className="text-sm font-mono text-[#00d4aa]">
-              Total XP: {totalSkillXP.toLocaleString()}
+              {t(translations.skills.totalXP, lang)}: {totalSkillXP.toLocaleString()}
             </span>
           </div>
         </div>
@@ -152,7 +155,7 @@ const SkillsSection = () => {
                   className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium data-[state=active]:bg-[#00d4aa]/10 data-[state=active]:text-[#00d4aa] data-[state=active]:border data-[state=active]:border-[#00d4aa]/30 text-[#6b7280] transition-all"
                 >
                   <Icon className="w-4 h-4" />
-                  {cat}
+                  {t(translations.skills.tabs[cat], lang)}
                 </TabsTrigger>
               );
             })}
@@ -167,6 +170,7 @@ const SkillsSection = () => {
                     skill={skill}
                     index={i}
                     visible={visible && activeTab === cat}
+                    lang={lang}
                   />
                 ))}
               </div>

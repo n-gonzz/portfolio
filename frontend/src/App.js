@@ -8,21 +8,24 @@ import EducationSection from "@/components/EducationSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-[#e8e8ed] font-figtree">
-      <Header />
-      <main>
-        <HeroSection />
-        <SkillsSection />
-        <ProjectsSection />
-        <EducationSection />
-        <ContactSection />
-      </main>
-      <Footer />
-      <Toaster />
-    </div>
+    <LanguageProvider>
+      <div className="min-h-screen bg-[#0a0a0f] text-[#e8e8ed] font-figtree">
+        <Header />
+        <main>
+          <HeroSection />
+          <SkillsSection />
+          <ProjectsSection />
+          <EducationSection />
+          <ContactSection />
+        </main>
+        <Footer />
+        <Toaster />
+      </div>
+    </LanguageProvider>
   );
 }
 

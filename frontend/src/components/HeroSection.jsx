@@ -12,7 +12,9 @@ import {
   Code,
   Users,
 } from "lucide-react";
-import { personalInfo, typewriterTexts, stats, achievements } from "../data/mock";
+import { personalInfo, stats, achievements } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
 const iconMap = {
   LayoutGrid,
@@ -41,9 +43,15 @@ const useCountUp = (end, duration = 2000, start = false) => {
   return count;
 };
 
-const StatCard = ({ stat, index, visible }) => {
+const StatCard = ({ stat, index, visible, lang }) => {
   const IconComp = iconMap[stat.icon];
   const count = useCountUp(stat.value, 2000, visible);
+  const labelMap = {
+    "Projects Built": translations.hero.projectsBuilt,
+    "GitHub Repos": translations.hero.githubRepos,
+    "Lines of Code": translations.hero.linesOfCode,
+    "Clients Served": translations.hero.clientsServed,
+  };
   return (
     <div
       className="group bg-[#12121a]/60 backdrop-blur-sm border border-[#1e1e2e] rounded-xl p-4 text-center hover:border-[#2a2a3e] transition-all duration-300 hover:bg-[#12121a]"
@@ -59,12 +67,12 @@ const StatCard = ({ stat, index, visible }) => {
       <div className="text-2xl md:text-3xl font-bold text-white font-figtree">
         {typeof stat.value === "string" ? stat.value : count}
       </div>
-      <div className="text-xs text-[#6b7280] mt-1">{stat.label}</div>
+      <div className="text-xs text-[#6b7280] mt-1">{t(labelMap[stat.label], lang)}</div>
     </div>
   );
 };
 
-const AchievementCard = ({ achievement }) => (
+const AchievementCard = ({ achievement, index, lang }) => (
   <div
     className="bg-[#12121a]/60 backdrop-blur-sm border rounded-lg p-3 hover:scale-[1.03] transition-transform duration-200 cursor-default"
     style={{ borderColor: `${achievement.color}30` }}
@@ -75,9 +83,9 @@ const AchievementCard = ({ achievement }) => (
     >
       {achievement.rarity}
     </span>
-    <h4 className="text-sm font-bold text-white mt-1">{achievement.name}</h4>
+    <h4 className="text-sm font-bold text-white mt-1">{t(translations.achievements.items[index].name, lang)}</h4>
     <p className="text-[11px] text-[#6b7280] mt-0.5 leading-tight">
-      {achievement.description}
+      {t(translations.achievements.items[index].description, lang)}
     </p>
   </div>
 );
@@ -88,10 +96,19 @@ const HeroSection = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
+  const { lang } = useLang();
+
+  const typewriterTexts = translations.typewriter.texts[lang];
 
   useEffect(() => {
     setVisible(true);
   }, []);
+
+  useEffect(() => {
+    setDisplayText("");
+    setIsDeleting(false);
+    setTextIndex(0);
+  }, [lang]);
 
   useEffect(() => {
     const currentText = typewriterTexts[textIndex];
@@ -148,11 +165,11 @@ const HeroSection = () => {
             >
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00d4aa]/10 border border-[#00d4aa]/30 rounded-full text-xs font-mono text-[#00d4aa]">
                 <span className="w-2 h-2 rounded-full bg-[#00d4aa] animate-pulse" />
-                Available for hire
+                {t(translations.hero.availableForHire, lang)}
               </span>
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 rounded-full text-xs font-mono text-[#ffd700]">
                 <Trophy className="w-3 h-3" />
-                Level {personalInfo.level}
+                {t(translations.hero.level, lang)} {personalInfo.level}
               </span>
             </div>
 
@@ -165,7 +182,7 @@ const HeroSection = () => {
                 transition: "all 0.6s ease 0.2s",
               }}
             >
-              Hi, I'm {personalInfo.name}
+              {t(translations.hero.greeting, lang)} {personalInfo.name}
             </h1>
 
             {/* Typewriter */}
@@ -191,7 +208,7 @@ const HeroSection = () => {
                 transition: "all 0.6s ease 0.4s",
               }}
             >
-              {personalInfo.tagline}
+              {t(translations.hero.tagline, lang)}
             </p>
 
             {/* Links */}
@@ -244,18 +261,18 @@ const HeroSection = () => {
                 className="flex items-center gap-2 bg-[#00d4aa] hover:bg-[#00e4ba] text-[#0a0a0f] font-bold px-6 py-3 rounded-lg transition-all duration-200 hover:shadow-[0_0_25px_rgba(0,212,170,0.3)]"
               >
                 <Sparkles className="w-4 h-4" />
-                View Projects
+                {t(translations.hero.viewProjects, lang)}
               </button>
               <button className="flex items-center gap-2 border border-[#2a2a3e] hover:border-[#00d4aa]/50 text-[#e8e8ed] px-6 py-3 rounded-lg transition-all duration-200 hover:bg-[#12121a]">
                 <Download className="w-4 h-4" />
-                Resume
+                {t(translations.hero.resume, lang)}
               </button>
             </div>
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {stats.map((stat, i) => (
-                <StatCard key={stat.label} stat={stat} index={i} visible={visible} />
+                <StatCard key={stat.label} stat={stat} index={i} visible={visible} lang={lang} />
               ))}
             </div>
           </div>
@@ -272,11 +289,11 @@ const HeroSection = () => {
             <div className="bg-[#12121a]/40 backdrop-blur-sm border border-[#1e1e2e] rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Trophy className="w-5 h-5 text-[#ffd700]" />
-                <h3 className="text-base font-bold text-white">Achievements Unlocked</h3>
+                <h3 className="text-base font-bold text-white">{t(translations.hero.achievementsUnlocked, lang)}</h3>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
-                {achievements.map((a) => (
-                  <AchievementCard key={a.name} achievement={a} />
+                {achievements.map((a, i) => (
+                  <AchievementCard key={a.name} achievement={a} index={i} lang={lang} />
                 ))}
               </div>
             </div>

@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { experience, education, certifications } from "../data/mock";
+import translations, { t } from "../data/translations";
+import { useLang } from "../context/LanguageContext";
 
-const TimelineItem = ({ item, type, index, visible }) => (
+const TimelineItem = ({ item, type, index, visible, lang, tData }) => (
   <div
     className="relative pl-8 pb-8 last:pb-0"
     style={{
@@ -29,14 +31,14 @@ const TimelineItem = ({ item, type, index, visible }) => (
     <div className="bg-[#12121a]/60 backdrop-blur-sm border border-[#1e1e2e] rounded-xl p-5 hover:border-[#2a2a3e] transition-all duration-300">
       <div className="flex items-center gap-2 mb-2">
         <Calendar className="w-3.5 h-3.5 text-[#6b7280]" />
-        <span className="text-xs font-mono text-[#6b7280]">{item.period}</span>
+        <span className="text-xs font-mono text-[#6b7280]">{tData.period ? t(tData.period, lang) : item.period}</span>
       </div>
-      <h3 className="text-lg font-bold text-white">{item.title}</h3>
+      <h3 className="text-lg font-bold text-white">{t(tData.title, lang)}</h3>
       <p className="text-sm font-medium text-[#00d4aa] mb-2">
-        {type === "experience" ? item.company : item.institution}
+        {type === "experience" ? (tData.company || item.company) : t(tData.institution || {}, lang) || item.institution}
       </p>
       <p className="text-sm text-[#8a8a9a] leading-relaxed mb-3">
-        {item.description}
+        {t(tData.description, lang)}
       </p>
       {/* Tech tags or Achievement badges */}
       {item.tech && (
@@ -53,7 +55,7 @@ const TimelineItem = ({ item, type, index, visible }) => (
       )}
       {item.badges && (
         <div className="flex flex-wrap gap-1.5">
-          {item.badges.map((b) => (
+          {(tData.badges ? (Array.isArray(tData.badges) ? tData.badges : t(tData.badges, lang)) : item.badges).map((b) => (
             <span
               key={b}
               className="inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-1 rounded-lg bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700]"
@@ -68,7 +70,7 @@ const TimelineItem = ({ item, type, index, visible }) => (
   </div>
 );
 
-const CertCard = ({ cert, index, visible }) => (
+const CertCard = ({ cert, index, visible, lang, tData }) => (
   <div
     className="bg-[#12121a]/60 backdrop-blur-sm border border-[#1e1e2e] rounded-xl p-5 hover:border-[#2a2a3e] transition-all duration-300"
     style={{
@@ -82,7 +84,7 @@ const CertCard = ({ cert, index, visible }) => (
         <Award className="w-5 h-5 text-[#ffd700]" />
       </div>
       <div>
-        <h4 className="text-sm font-bold text-white">{cert.name}</h4>
+        <h4 className="text-sm font-bold text-white">{t(tData.name, lang)}</h4>
         <p className="text-xs text-[#6b7280] font-mono">
           {cert.issuer} · {cert.year}
         </p>
@@ -94,6 +96,7 @@ const CertCard = ({ cert, index, visible }) => (
 const EducationSection = () => {
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
+  const { lang } = useLang();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -122,14 +125,14 @@ const EducationSection = () => {
               <GraduationCap className="w-5 h-5 text-[#a855f7]" />
             </div>
             <span className="text-xs font-mono font-bold tracking-[0.2em] text-[#a855f7] uppercase">
-              Journey Log
+              {t(translations.education.label, lang)}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white font-figtree mb-3">
-            Experience & Education
+            {t(translations.education.heading, lang)}
           </h2>
           <p className="text-[#8a8a9a] text-base max-w-lg mb-8">
-            My professional journey and academic background that shaped my skills.
+            {t(translations.education.description, lang)}
           </p>
         </div>
 
@@ -140,21 +143,21 @@ const EducationSection = () => {
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium data-[state=active]:bg-[#00d4aa]/10 data-[state=active]:text-[#00d4aa] data-[state=active]:border data-[state=active]:border-[#00d4aa]/30 text-[#6b7280] transition-all"
             >
               <Briefcase className="w-4 h-4" />
-              Experience
+              {t(translations.education.tabs.experience, lang)}
             </TabsTrigger>
             <TabsTrigger
               value="education"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium data-[state=active]:bg-[#00d4aa]/10 data-[state=active]:text-[#00d4aa] data-[state=active]:border data-[state=active]:border-[#00d4aa]/30 text-[#6b7280] transition-all"
             >
               <BookOpen className="w-4 h-4" />
-              Education
+              {t(translations.education.tabs.education, lang)}
             </TabsTrigger>
             <TabsTrigger
               value="certifications"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium data-[state=active]:bg-[#00d4aa]/10 data-[state=active]:text-[#00d4aa] data-[state=active]:border data-[state=active]:border-[#00d4aa]/30 text-[#6b7280] transition-all"
             >
               <Award className="w-4 h-4" />
-              Certifications
+              {t(translations.education.tabs.certifications, lang)}
             </TabsTrigger>
           </TabsList>
 
@@ -167,6 +170,8 @@ const EducationSection = () => {
                   type="experience"
                   index={i}
                   visible={visible}
+                  lang={lang}
+                  tData={translations.education.experience[i]}
                 />
               ))}
             </div>
@@ -181,6 +186,8 @@ const EducationSection = () => {
                   type="education"
                   index={i}
                   visible={visible}
+                  lang={lang}
+                  tData={translations.education.educationItems[i]}
                 />
               ))}
             </div>
@@ -189,7 +196,7 @@ const EducationSection = () => {
           <TabsContent value="certifications">
             <div className="grid md:grid-cols-2 gap-4 max-w-2xl">
               {certifications.map((cert, i) => (
-                <CertCard key={cert.name} cert={cert} index={i} visible={visible} />
+                <CertCard key={cert.name} cert={cert} index={i} visible={visible} lang={lang} tData={translations.education.certifications[i]} />
               ))}
             </div>
           </TabsContent>
